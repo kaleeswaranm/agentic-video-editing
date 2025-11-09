@@ -18,8 +18,9 @@ def code_reviewer_node(state: VideoEditingState) -> VideoEditingState:
     correctness, completeness, and quality. Either approves it or provides
     an updated/corrected version.
     """
-    file_manager = FileManager()
-    progress_tracker = ProgressTracker()
+    artifacts_dir = state.get("artifacts_dir", "artifacts")
+    file_manager = FileManager(artifacts_dir=artifacts_dir)
+    progress_tracker = ProgressTracker(progress_file=f"{artifacts_dir}/progress.json")
     
     progress_tracker.set_stage("CODE_REVIEW", {})
     
@@ -301,15 +302,15 @@ Please review this code against the plan above. Check that all operations from t
         
         # Save reviewed code to file
         # First, check if reviewed_code.py exists and rename it to preserve history
-        artifacts_dir = Path("artifacts")
-        existing_file = artifacts_dir / "reviewed_code.py"
+        artifacts_dir_path = Path(artifacts_dir)
+        existing_file = artifacts_dir_path / "reviewed_code.py"
         if existing_file.exists():
             # Find the next available version number
             version = 1
-            while (artifacts_dir / f"reviewed_code_{version}.py").exists():
+            while (artifacts_dir_path / f"reviewed_code_{version}.py").exists():
                 version += 1
             # Rename the existing file
-            old_file_path = artifacts_dir / f"reviewed_code_{version}.py"
+            old_file_path = artifacts_dir_path / f"reviewed_code_{version}.py"
             existing_file.rename(old_file_path)
             progress_tracker.add_info(f"Renamed previous reviewed_code.py to reviewed_code_{version}.py")
             print(f"📦 Archived previous code as: reviewed_code_{version}.py")

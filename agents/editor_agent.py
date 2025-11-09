@@ -15,13 +15,14 @@ def editor_node(state: VideoEditingState) -> VideoEditingState:
     Uses LLM (GPT-5 for coding) to generate Python code that implements
     the video editing workflow from the reviewed plan.
     """
-    file_manager = FileManager()
-    progress_tracker = ProgressTracker()
+    artifacts_dir = state.get("artifacts_dir", "artifacts")
+    file_manager = FileManager(artifacts_dir=artifacts_dir)
+    progress_tracker = ProgressTracker(progress_file=f"{artifacts_dir}/progress.json")
     
     progress_tracker.set_stage("CODE_GENERATION", {})
     
     reviewed_plan = state.get("reviewed_plan")
-    output_video_path = state.get("output_video_path", "artifacts/output_video.mp4")
+    output_video_path = state.get("output_video_path", f"{artifacts_dir}/output_video.mp4")
     errors = state.get("errors", [])
     
     if not reviewed_plan:
@@ -65,7 +66,7 @@ Requirements:
 4. Follow the plan step-by-step
 5. Include all necessary imports (all libraries above are already installed in the environment)
 6. Handle file paths correctly (use pathlib or os.path)
-7. Create intermediate directories if needed (e.g., artifacts/temp/)
+7. Create intermediate directories if needed (e.g., <artifacts_dir>/temp/)
 8. **DO NOT use try/except blocks** - Let errors propagate naturally so they can be detected and fixed
 9. Add progress logging using print statements
 10. Make code readable with comments

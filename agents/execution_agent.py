@@ -22,13 +22,14 @@ def execution_node(state: VideoEditingState) -> VideoEditingState:
     Executes the reviewed Python code using subprocess and captures
     output, errors, and execution results.
     """
-    file_manager = FileManager()
-    progress_tracker = ProgressTracker()
+    artifacts_dir = state.get("artifacts_dir", "artifacts")
+    file_manager = FileManager(artifacts_dir=artifacts_dir)
+    progress_tracker = ProgressTracker(progress_file=f"{artifacts_dir}/progress.json")
     
     progress_tracker.set_stage("EXECUTION", {})
     
     reviewed_code = state.get("reviewed_code")
-    output_video_path = state.get("output_video_path", "artifacts/output_video.mp4")
+    output_video_path = state.get("output_video_path", f"{artifacts_dir}/output_video.mp4")
     execution_result = state.get("execution_result", {})
     errors = state.get("errors", [])
     
@@ -97,7 +98,7 @@ def execution_node(state: VideoEditingState) -> VideoEditingState:
             # Check if code produced video at different location
             # Look for common output locations
             possible_paths = [
-                Path("artifacts/output_video.mp4"),
+                Path(f"{artifacts_dir}/output_video.mp4"),
                 Path(output_video_path),
                 Path("output_video.mp4"),
             ]

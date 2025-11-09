@@ -16,8 +16,9 @@ def csv_validator_node(state: VideoEditingState) -> VideoEditingState:
     Validates the CSV file structure, data types, file paths, and time ranges.
     Saves validated CSV data to artifacts.
     """
-    file_manager = FileManager()
-    progress_tracker = ProgressTracker()
+    artifacts_dir = state.get("artifacts_dir", "artifacts")
+    file_manager = FileManager(artifacts_dir=artifacts_dir)
+    progress_tracker = ProgressTracker(progress_file=f"{artifacts_dir}/progress.json")
     
     progress_tracker.set_stage("CSV_VALIDATION", {"csv_path": state.get("csv_path", "")})
     
