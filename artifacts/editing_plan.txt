@@ -2,48 +2,50 @@ Plan Summary
 - Output: artifacts/output_video.mp4
 - Total Clips: 5
 
-Clip 1 (CSV order)
+Clip 1
 1) Source: workspace/video36.mp4
 2) Trim: start=0.0, end=10.0
-3) Transitions (in-place, edges): pre=fade_in(duration=0.5s), post=none
+3) Transitions (in-place, edges): pre=fade(duration=0.5s), post=none
 4) Effects: brightness=1.1, contrast=1.2
-5) Text Overlays: text="Welcome to Our Video", position=center, fontsize=48, color=white, bg_color=black, bg_opacity=DEFAULT: 0.5, start=0.0, end=3.0
+5) Text Overlays: text="Welcome to Our Video", position=center, fontsize=48, color=white, background=semi-transparent black, start=0.0, end=3.0
 6) Audio:
    - mode=keep
    - window: start=0.0, end=10.0
-   - mix: external_volume=none, original_volume=0.8, fades: in=0.5, out=0.5
+   - external_handling=DEFAULT: none
+   - original_volume=0.8, fades: in=0.5, out=0.5
 7) Additional Ops: none
 8) Save: in-place
 
-Clip 2 (CSV order)
+Clip 2
 1) Source: workspace/video37.mp4
 2) Trim: start=0.0, end=8.5
-3) Transitions (in-place, edges): pre=none, post=none
+3) Transitions (in-place, edges): pre=none, post=crossfade(duration=1.0s)
 4) Effects: speed=1.2x, stabilize=on
 5) Text Overlays: none
 6) Audio:
    - mode=replace
    - audio_path=workspace/ff-16b-2c-44100hz.mp3
-   - window: start=0.0, end=7.0833
+   - window: start=0.0, end=8.5
    - external_handling=loop_when_requested
-   - mix: external_volume=1.0, original_volume=0.0, fades: in=0.0, out=0.0
+   - external_volume=1.0
 7) Additional Ops: none
 8) Save: in-place
 
-Clip 3 (CSV order)
+Clip 3
 1) Source: workspace/video38.mp4
 2) Trim: start=2.0, end=12.0
-3) Transitions (in-place, edges): pre=none, post=none
-4) Effects: sepia=0.3, vignette=DEFAULT: 0.5
-5) Text Overlays: text="Scene Transition", position=bottom_center, fontsize=36, color=yellow, start=1.0, end=4.0
+3) Transitions (in-place, edges): pre=none, post=wipe(duration=0.8s)
+4) Effects: sepia=30%, vignette=on
+5) Text Overlays: text="Scene Transition", position=bottom center, fontsize=36, color=yellow, start=1.0, end=4.0
 6) Audio:
    - mode=keep
    - window: start=0.0, end=10.0
-   - mix: external_volume=none, original_volume=0.7, fades: in=0.3, out=DEFAULT: 0.0
-7) Additional Ops: rotate=0, scale=1.0
+   - external_handling=DEFAULT: none
+   - original_volume=0.7, fades: in=0.3, out=DEFAULT: 0.0
+7) Additional Ops: rotate=0, scale=100%
 8) Save: in-place
 
-Clip 4 (CSV order)
+Clip 4
 1) Source: workspace/video52.mp4
 2) Trim: start=0.0, end=6.0
 3) Transitions (in-place, edges): pre=none, post=none
@@ -54,28 +56,26 @@ Clip 4 (CSV order)
    - audio_path=workspace/file_example_MP3_1MG.mp3
    - window: start=0.0, end=6.0
    - external_handling=trim
-   - mix: external_volume=0.9, original_volume=0.0, fades: in=0.0, out=0.0
+   - external_volume=0.9
 7) Additional Ops: flip=horizontal
 8) Save: in-place
 
-Clip 5 (CSV order)
+Clip 5
 1) Source: workspace/video53.mp4
 2) Trim: start=0.0, end=9.5
-3) Transitions (in-place, edges): pre=none, post=fade_out(duration=1.0s)
+3) Transitions (in-place, edges): pre=none, post=fade(duration=1.0s)
 4) Effects: brightness=0.9, contrast=1.1, saturation=1.2
-5) Text Overlays: text="Thank You", position=top_left, fontsize=24, color=red, start=0.0, end=2.0
+5) Text Overlays: text="Thank You", position=top left, fontsize=24, color=red, start=0.0, end=2.0
 6) Audio:
-   - mode=keep
+   - mode=replace
+   - audio_path=MISSING
    - window: start=0.0, end=9.5
-   - mix: external_volume=none, original_volume=0.0, fades: in=0.0, out=0.0
-7) Additional Ops: rotate=90, scale=0.8
+   - external_handling=DEFAULT: none
+   - external_volume=0.0
+7) Additional Ops: rotate=90, scale=80%
 8) Save: in-place
 
 Final Assembly
 - Order: [1, 2, 3, 4, 5]
-- Between-clip transitions (if any):
-  - 1->2: crossfade(duration=1.0s)
-  - 2->3: wipe(duration=0.8s, direction=MISSING: wipe_direction DEFAULT: left_to_right)
-  - 3->4: cut
-  - 4->5: none
+- Between-clip transitions: MISSING
 - Export: path=artifacts/output_video.mp4, format=mp4
