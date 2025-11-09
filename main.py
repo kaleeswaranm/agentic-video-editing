@@ -7,6 +7,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from agents.workflow import get_workflow
+from agents.execution_agent import MAX_RETRIES
 from state import VideoEditingState
 
 # Load environment variables
@@ -108,7 +109,7 @@ def main():
         has_errors = final_state.get("errors") and len(final_state.get("errors", [])) > 0
         execution_result = final_state.get("execution_result")
         execution_failed = execution_result and not execution_result.get("success", True)
-        max_retries_exceeded = execution_result and execution_result.get("retry_count", 0) >= 3
+        max_retries_exceeded = execution_result and execution_result.get("retry_count", 0) >= MAX_RETRIES
         
         if has_errors or (execution_failed and max_retries_exceeded):
             print("\n" + "=" * 60)
