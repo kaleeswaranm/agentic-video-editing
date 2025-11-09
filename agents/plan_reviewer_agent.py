@@ -18,8 +18,9 @@ def plan_reviewer_node(state: VideoEditingState) -> VideoEditingState:
     Uses LLM to review the editing plan for completeness, correctness, and clarity.
     Either approves the plan or provides an updated/corrected version.
     """
-    file_manager = FileManager()
-    progress_tracker = ProgressTracker()
+    artifacts_dir = state.get("artifacts_dir", "artifacts")
+    file_manager = FileManager(artifacts_dir=artifacts_dir)
+    progress_tracker = ProgressTracker(progress_file=f"{artifacts_dir}/progress.json")
     
     progress_tracker.set_stage("PLAN_REVIEW", {})
     

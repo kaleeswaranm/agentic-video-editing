@@ -55,6 +55,12 @@ def main():
         default=os.getenv("CODING_MODEL", "gpt-5"),
         help="LLM model for coding/code review tasks (default: gpt-5, or from CODING_MODEL env var)"
     )
+    parser.add_argument(
+        "--artifacts-dir",
+        type=str,
+        default="artifacts",
+        help="Directory for storing artifacts (default: artifacts)"
+    )
     
     args = parser.parse_args()
     
@@ -70,16 +76,25 @@ def main():
         print(f"Error: CSV file not found: {csv_path}")
         sys.exit(1)
     
+    # Set default output path if using the default (construct from artifacts_dir)
+    artifacts_dir = args.artifacts_dir
+    if args.output == "artifacts/output_video.mp4":
+        # Replace hardcoded default with artifacts_dir-based path
+        output_path = f"{artifacts_dir}/output_video.mp4"
+    else:
+        output_path = args.output
+    
     # Initialize state
     initial_state: VideoEditingState = {
         "csv_path": str(csv_path.absolute()),
+        "artifacts_dir": artifacts_dir,
         "validated_csv": None,
         "editing_plan": None,
         "reviewed_plan": None,
         "generated_code": None,
         "reviewed_code": None,
         "execution_result": None,
-        "output_video_path": args.output,
+        "output_video_path": output_path,
         "validation_result": None,
         "progress": {},
         "errors": [],
@@ -90,7 +105,8 @@ def main():
     print("Agentic Video Editing Tool")
     print("=" * 60)
     print(f"CSV File: {csv_path.absolute()}")
-    print(f"Output: {args.output}")
+    print(f"Output: {output_path}")
+    print(f"Artifacts Directory: {artifacts_dir}")
     print(f"LLM Provider: {args.llm_provider}")
     print(f"Planning Model: {args.planning_model}")
     print(f"Coding Model: {args.coding_model}")

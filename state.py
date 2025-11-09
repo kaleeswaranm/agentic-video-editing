@@ -8,6 +8,7 @@ class VideoEditingState(TypedDict):
     
     # Input
     csv_path: str
+    artifacts_dir: Optional[str]
     
     # Intermediate artifacts
     validated_csv: Optional[Dict[str, Any]]

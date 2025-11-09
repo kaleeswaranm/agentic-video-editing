@@ -19,8 +19,9 @@ def planning_node(state: VideoEditingState) -> VideoEditingState:
     Uses LLM to interpret natural language specifications and create
     a text-based, step-by-step editing plan.
     """
-    file_manager = FileManager()
-    progress_tracker = ProgressTracker()
+    artifacts_dir = state.get("artifacts_dir", "artifacts")
+    file_manager = FileManager(artifacts_dir=artifacts_dir)
+    progress_tracker = ProgressTracker(progress_file=f"{artifacts_dir}/progress.json")
     
     progress_tracker.set_stage("PLANNING", {})
     
@@ -120,7 +121,7 @@ Total clips: {total_clips}
 CSV context:
 {clips_context}
 
-Output path: {state.get('output_video_path', 'artifacts/output_video.mp4')}
+Output path: {state.get('output_video_path', f'{artifacts_dir}/output_video.mp4')}
 
 Requirements:
 - In-place operations only (no extra/replacement segments)
