@@ -1,6 +1,6 @@
 # Agentic Video Editing Tool
 
-AI-powered video editing tool to automatically create edited videos with transitions, effects, text overlays, and audio mixing. The tool is end-to-end autonomous till the final edit generation. Just feed in your edit requirements as a csv.
+AI-powered agentic video editing tool to automatically create edited videos with transitions, effects, text overlays, and audio mixing. The tool is end-to-end autonomous till the final edit generation. Just feed in your edit requirements as a csv.
 
 Find a edit produced using this tool here - `artifacts/output_video.mp4` and all the generated/reviewed plans and codes here - `artifacts`. These artifacts are based on `video_editing_config_01.csv`.
 
