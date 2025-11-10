@@ -10,7 +10,7 @@ Find a edit produced using this tool here - `artifacts/output_video.mp4` and all
 pip install -r requirements.txt
 ```
 
-**Note:** Requires `exiftool` for phone video orientation detection:
+**Note:** Requires `exiftool` for video orientation detection, if videos are imported through an iPhone:
 - macOS: `brew install exiftool`
 - Linux: `apt-get install libimage-exiftool-perl` or `yum install perl-Image-ExifTool`
 
