@@ -32,6 +32,8 @@ Required columns:
 - `audio_description` - Audio mode (keep/replace/mix), volume, external audio path, transitions, etc
 - `additional_operations` - Additional ops (rotate, scale, crop), image duration (e.g., "display for 0.5s"), or any other operations/tasks
 
+Check the available config csv files for reference.
+
 ## Configuration
 
 Environment variables (optional, can also use CLI args. Preferred create a .env file):
