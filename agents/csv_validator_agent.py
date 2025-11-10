@@ -40,6 +40,14 @@ def csv_validator_node(state: VideoEditingState) -> VideoEditingState:
         progress_tracker.add_info(f"Reading CSV file: {csv_path}")
         df = pd.read_csv(csv_path)
         
+        # Filter out completely empty rows (rows where all values are NaN/empty)
+        initial_row_count = len(df)
+        df = df.dropna(how='all')  # Drop rows where all columns are NaN
+        filtered_row_count = len(df)
+        if initial_row_count > filtered_row_count:
+            removed_count = initial_row_count - filtered_row_count
+            progress_tracker.add_info(f"Filtered out {removed_count} completely empty row(s)")
+        
         # Validate CSV
         progress_tracker.add_info("Validating CSV structure and data...")
         is_valid, validation_errors, warnings = validate_csv_complete(df)

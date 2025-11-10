@@ -1,0 +1,22 @@
+order,video_path,start_time,end_time,transition,effects,overlay_text,overlay_description,audio_description,additional_operations
+1,workspace/IMG_3692.MOV,2,-1,Fade in first 2s and fade out last 2 second,,"""A dog's day out""","center screen, font size 48 in yellow color, appears first 2 second of the clip",reduce volume to 0.2x of original volume,randomly sample a segment of length equal to final assembled video from workspace/Colorful-Flowers(chosic.com).mp3 and reduce its volume to 0.5x of original volumn and mix it on the entire final assembled video background
+2,workspace/IMG_3693.MOV,5,-1,Fade in first 1s and fade out last 1s,,A new friend,"Bottom left, font size 48 in yellow color, appears first 2 second of the clip",reduce volume to 0.2x of original volume,
+3,workspace/IMG_3697.mov,2,-1,Fade in first 1s and fade out last 1s,,"""Let me in the pool""","Bottom left, font size 48 in yellow color",reduce volume to 0.2x of original volume,
+4,workspace/IMG_3708.MOV,1,-1,Fade in first 1s and fade out last 1s,,"""Pet me""","Bottom left, font size 48 in yellow color",reduce volume to 0.2x of original volume,
+5,workspace/IMG_3710.mov,3,7,,Slomo 0.5x for middle 2 seconds of clip,Its getting hot in here,"Bottom left, font size 48 in yellow color, appears first 2 second of the clip",reduce volume to 0.2x of original volume,
+6,workspace/IMG_3711.mov,0,-1,,Slomo 0.5x for middle 2 seconds of clip,David vs Goliath,"Bottom left, font size 48 in yellow color, appears first 2 second of the clip",reduce volume to 0.2x of original volume,
+7,workspace/IMG_3727.mov,0,-1,Fade in first 1s and fade out last 1s,,BFF,"Bottom left, font size 48 in yellow color, appears first 2 second of the clip",reduce volume to 0.2x of original volume,
+8,workspace/IMG_3736.mov,0,-1,Fade in first 1s and fade out last 1s,,Nap time,"Bottom left, font size 48 in yellow color, appears first 2 second of the clip",reduce volume to 0.2x of original volume,
+9,workspace/IMG_3746.mov,0,-1,,,"""Jump scare""","Bottom left, font size 48 in yellow color, appears last 2 second of the clip",reduce volume to 0.2x of original volume,
+10,workspace/IMG_3701.HEIC,,,,,Other clicks of the day,"Bottom left, font size 48 in yellow color",,Relay this image for 1s
+11,workspace/IMG_3703.HEIC,,,,,Other clicks of the day,"Bottom left, font size 48 in yellow color",,Relay this image for 1s
+12,workspace/IMG_3714.HEIC,,,,,Other clicks of the day,"Bottom left, font size 48 in yellow color",,Relay this image for 1s
+13,workspace/IMG_3718.HEIC,,,,,Other clicks of the day,"Bottom left, font size 48 in yellow color",,Relay this image for 1s
+14,workspace/IMG_3721.HEIC,,,,,,,,Relay this image for 1s
+15,workspace/IMG_3725.HEIC,,,,,,,,Relay this image for 1s
+16,workspace/IMG_3726.HEIC,,,,,,,,Relay this image for 1s
+17,workspace/IMG_3730.heic,,,,,,,,Relay this image for 1s
+18,workspace/IMG_3731.heic,,,,,,,,Relay this image for 1s
+19,workspace/IMG_3735.HEIC,,,,,,,,Relay this image for 1s
+20,workspace/IMG_3740.HEIC,,,,,,,,Relay this image for 1s
+21,workspace/IMG_3753.mov,0,-1,Fade in first 2s and fade out last 2 second,,"""See you all next time. Miss you guys!!""","Center of screen, font size 48 in yellow color",reduce volume to 0.2x of original volume,

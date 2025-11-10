@@ -4,7 +4,7 @@ from typing import List, Tuple, Dict, Any
 import pandas as pd
 from pathlib import Path
 
-from tools.file_tools import check_file_exists, is_video_file, is_audio_file
+from tools.file_tools import check_file_exists, is_video_file, is_audio_file, is_image_file
 
 
 REQUIRED_COLUMNS = [
@@ -44,12 +44,27 @@ def validate_data_types(df: pd.DataFrame) -> Tuple[bool, List[str]]:
             errors.append("Column 'order' must contain integers")
     
     # Validate start_time and end_time
+    # Note: Image files don't need start_time/end_time (they only need duration in additional_operations)
     for col in ['start_time', 'end_time']:
         if col in df.columns:
             try:
                 df[col] = pd.to_numeric(df[col], errors='coerce')
+                # Check for NaN values, but allow NaN for image file rows
                 if df[col].isna().any():
-                    errors.append(f"Column '{col}' contains non-numeric values")
+                    # Check if NaN is only in image file rows
+                    if 'video_path' in df.columns:
+                        nan_mask = df[col].isna()
+                        # Check which rows with NaN are image files
+                        image_mask = df['video_path'].apply(
+                            lambda x: is_image_file(str(x)) if pd.notna(x) and x else False
+                        )
+                        # Only report error if there are NaN values in non-image rows
+                        non_image_nan = nan_mask & ~image_mask
+                        if non_image_nan.any():
+                            errors.append(f"Column '{col}' contains non-numeric values")
+                    else:
+                        # No video_path column, check all NaN
+                        errors.append(f"Column '{col}' contains non-numeric values")
             except (ValueError, TypeError):
                 errors.append(f"Column '{col}' must contain numeric values")
     
@@ -57,24 +72,37 @@ def validate_data_types(df: pd.DataFrame) -> Tuple[bool, List[str]]:
 
 
 def validate_time_ranges(df: pd.DataFrame) -> Tuple[bool, List[str]]:
-    """Validate time ranges (start_time < end_time, both >= 0)."""
+    """Validate time ranges (start_time < end_time, both >= 0, or end_time = -1 for 'till end')."""
     errors = []
     
     if 'start_time' in df.columns and 'end_time' in df.columns:
         for idx, row in df.iterrows():
             start = row.get('start_time')
             end = row.get('end_time')
+            video_path = row.get('video_path', '')
+            
+            # Skip validation for image files (they don't need time ranges, only duration)
+            if pd.notna(video_path) and is_image_file(str(video_path)):
+                continue
             
             if pd.isna(start) or pd.isna(end):
                 errors.append(f"Row {idx + 1}: Missing start_time or end_time")
                 continue
             
+            # Validate start_time
             if start < 0:
                 errors.append(f"Row {idx + 1}: start_time ({start}) must be >= 0")
             
-            if end < 0:
-                errors.append(f"Row {idx + 1}: end_time ({end}) must be >= 0")
+            # Handle special case: end_time = -1 means "till end of clip"
+            if end == -1:
+                # -1 is valid, skip end_time >= 0 check and start < end check
+                continue
             
+            # Validate end_time (only if not -1)
+            if end < 0:
+                errors.append(f"Row {idx + 1}: end_time ({end}) must be >= 0 or -1 (for 'till end')")
+            
+            # Validate start < end (only if end is not -1)
             if start >= end:
                 errors.append(
                     f"Row {idx + 1}: start_time ({start}) must be < end_time ({end})"
@@ -101,7 +129,7 @@ def validate_order_sequence(df: pd.DataFrame) -> Tuple[bool, List[str]]:
 
 
 def validate_file_paths(df: pd.DataFrame) -> Tuple[bool, List[str]]:
-    """Validate that video files exist at specified paths."""
+    """Validate that video or image files exist at specified paths."""
     errors = []
     warnings = []
     
@@ -113,11 +141,74 @@ def validate_file_paths(df: pd.DataFrame) -> Tuple[bool, List[str]]:
                 continue
             
             if not check_file_exists(str(video_path)):
-                errors.append(f"Row {idx + 1}: Video file not found: {video_path}")
-            elif not is_video_file(str(video_path)):
-                warnings.append(f"Row {idx + 1}: File may not be a video: {video_path}")
+                errors.append(f"Row {idx + 1}: File not found: {video_path}")
+            elif is_video_file(str(video_path)):
+                # Valid video file
+                pass
+            elif is_image_file(str(video_path)):
+                # Valid image file - will be validated for duration in validate_image_durations
+                pass
+            else:
+                warnings.append(f"Row {idx + 1}: File may not be a video or image: {video_path}")
     
     return len(errors) == 0, errors, warnings
+
+
+def validate_image_durations(df: pd.DataFrame) -> Tuple[bool, List[str]]:
+    """Validate that image files have duration specified in additional_operations."""
+    errors = []
+    
+    if 'video_path' in df.columns and 'additional_operations' in df.columns:
+        for idx, row in df.iterrows():
+            video_path = row.get('video_path')
+            additional_ops = str(row.get('additional_operations', ''))
+            
+            if pd.isna(video_path) or not video_path:
+                continue
+            
+            # Check if this is an image file
+            if is_image_file(str(video_path)):
+                # Try to extract duration from additional_operations
+                import re
+                # Look for patterns like "for X seconds", "duration: X", "display for X seconds", "for 0.5s", etc.
+                duration_patterns = [
+                    r'for\s+([\d.]+)\s+seconds?',  # "for 0.5 seconds" or "for 0.5 second"
+                    r'for\s+([\d.]+)\s*s\b',       # "for 0.5s" or "for 0.5 s"
+                    r'duration[:\s]+([\d.]+)\s*seconds?',  # "duration: 0.5 seconds"
+                    r'duration[:\s]+([\d.]+)\s*s\b',  # "duration: 0.5s"
+                    r'display\s+for\s+([\d.]+)\s+seconds?',  # "display for 0.5 seconds"
+                    r'display\s+for\s+([\d.]+)\s*s\b',  # "display for 0.5s"
+                    r'relay\s+.*?for\s+([\d.]+)\s*s\b',  # "relay this image for 0.5s"
+                    r'([\d.]+)\s+seconds?',  # "0.5 seconds" or "0.5 second"
+                    r'([\d.]+)\s*s\b',  # "0.5s" (standalone)
+                ]
+                
+                duration_found = False
+                duration_value = None
+                
+                for pattern in duration_patterns:
+                    match = re.search(pattern, additional_ops, re.IGNORECASE)
+                    if match:
+                        try:
+                            duration_value = float(match.group(1))
+                            if duration_value > 0:
+                                duration_found = True
+                                break
+                        except (ValueError, IndexError):
+                            continue
+                
+                if not duration_found:
+                    errors.append(
+                        f"Row {idx + 1}: Image file '{video_path}' requires duration specification "
+                        f"in additional_operations (e.g., 'display for 0.2 seconds')"
+                    )
+                elif duration_value is not None and duration_value <= 0:
+                    errors.append(
+                        f"Row {idx + 1}: Image file '{video_path}' duration must be positive, "
+                        f"found: {duration_value}"
+                    )
+    
+    return len(errors) == 0, errors
 
 
 def validate_audio_paths_in_descriptions(df: pd.DataFrame) -> Tuple[bool, List[str]]:
@@ -173,6 +264,10 @@ def validate_csv_complete(df: pd.DataFrame) -> Tuple[bool, List[str], List[str]]
     valid, errors, warnings = validate_file_paths(df)
     all_errors.extend(errors)
     all_warnings.extend(warnings)
+    
+    # Image duration validation (for image files)
+    valid, errors = validate_image_durations(df)
+    all_errors.extend(errors)
     
     # Audio path validation
     valid, errors = validate_audio_paths_in_descriptions(df)
