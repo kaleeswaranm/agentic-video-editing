@@ -45,6 +45,8 @@ Environment variables (optional, can also use CLI args. Preferred create a .env 
 - `PLANNING_MODEL` - Model for planning tasks (default: gpt-5)
 - `CODING_MODEL` - Model for code generation (default: gpt-5)
 
+Suggest using gpt-4.1 for a better balance of cost, time and accuracy.
+
 CLI options:
 - `--llm-provider` - LLM provider
 - `--llm-model` - LLM model
