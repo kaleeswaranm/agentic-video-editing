@@ -30,6 +30,12 @@ def is_audio_file(filepath: str) -> bool:
     return get_file_extension(filepath) in audio_extensions
 
 
+def is_image_file(filepath: str) -> bool:
+    """Check if file is an image file based on extension."""
+    image_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.tiff', '.tif', '.svg', '.heic', '.heif'}
+    return get_file_extension(filepath) in image_extensions
+
+
 def get_absolute_path(filepath: str) -> Optional[str]:
     """Get absolute path for a file."""
     path = Path(filepath)
