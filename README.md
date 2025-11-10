@@ -2,6 +2,8 @@
 
 AI-powered video editing tool  to automatically create edited videos with transitions, effects, text overlays, and audio mixing.
 
+Find a edit produced using this tool here - `artifacts/output_video.mp4`
+
 ## Installation
 
 ```bash
