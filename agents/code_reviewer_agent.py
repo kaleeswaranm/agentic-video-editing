@@ -93,6 +93,18 @@ The code was executed but failed with errors. Your job is to:
 - **Switch libraries if needed** - If MoviePy doesn't have a feature, use opencv-python, scipy, or other available libraries
 - **Fix import statements** - If import fails, check if the import path is correct for the library version, or use an alternative import
 
+**RESOLUTION NORMALIZATION - BLOCKER CHECKS (must enforce, fix if violated):**
+- Target must be explicit: width=1920, height=1080 (1080p landscape).
+- Must compute scale = min(1920/source_width, 1080/source_height) and derive (new_w, new_h) proportionally.
+- Must center the resized clip on a black background of size width=1920, height=1080 using CompositeVideoClip + ColorClip (bg ColorClip MUST be included in layers) OR on_color (MoviePy 1.0.3-safe).
+- Reject patterns that risk stretching:
+  * clip.resize((1920,1080)) directly.
+  * set_make_frame usage returning (height=1080, width=1920) frames while clip.size advertises (new_w,new_h).
+  * Missing assertion/log that final clip.size == (1920,1080).
+- Verify coordinate conventions are respected:
+  * MoviePy sizes are (width, height); NumPy arrays are (height, width, channels) and indexed [y, x].
+- If violations found, rewrite normalization to the composite-background method (include bg ColorClip in CompositeVideoClip) and explain changes in CHANGES; also add print of src/scaled/final sizes and an assert.
+
 Common issues to look for:
 - File path errors (missing files, incorrect paths)
 - MoviePy 1.0.3 API usage errors (ensure code uses MoviePy 1.0.3 patterns)
@@ -191,6 +203,21 @@ Review the code for:
    - The code should use standard MoviePy 1.0.3 imports (from moviepy.editor import ...)
    - MoviePy 1.0.3 is already installed in the environment, no need for installation code
 9. **File Handling**: Check file paths, directory creation, and resource cleanup
+10. **Resolution Normalization (BLOCKER)**:
+   - Target explicitly width=1920, height=1080.
+   - Must compute scale = min(1920/source_w, 1080/source_h), resize to (new_w, new_h) proportionally.
+   - Must center on a black background of size width=1920, height=1080 using CompositeVideoClip + ColorClip (bg must be included in layers) OR on_color; after normalization, print src/scaled/final sizes and assert clip.size == (1920,1080).
+   - Reject direct clip.resize((1920,1080)) or unsafe set_make_frame patterns that can cause stretching.
+   - Verify MoviePy vs NumPy dimension conventions are respected (MoviePy: (w,h), NumPy: (h,w,3); indexing [y,x]).
+11. **Orientation Handling (BLOCKER, EXIFTOOL ONLY)**:
+   - Code MUST detect rotation using EXIFTool only via subprocess (exiftool -Composite:Rotation -s3 <path>).
+   - Code MUST NOT rotate pixels for orientation; rotation is used only to determine effective scaling geometry:
+     * If rotation ∈ {90,270}: effective dims for scale = (eff_w, eff_h) = (source_height, source_width)
+     * scale = min(1920/eff_w, 1080/eff_h)
+     * Resized size WITHOUT rotating pixels: (new_w, new_h) = (int(source_height*scale), int(source_width*scale))
+     * Else: use standard (new_w, new_h) = (int(source_width*scale), int(source_height*scale))
+   - Must composite on ColorClip background to width=1920, height=1080; assert/log final size.
+   - Writer should clear rotation metadata via ffmpeg_params=["-metadata:s:v:0","rotate=0"].
 
 If the code is good and complete, respond with:
 APPROVED: [brief confirmation message]
